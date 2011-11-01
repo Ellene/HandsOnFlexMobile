@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		title="Mes contacts"
+		add="onAdd(event)" destructionPolicy="never">
+	
+	<s:layout>
+		<s:VerticalLayout />
+	</s:layout>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import spark.events.ViewNavigatorEvent;
+			protected function onClick(event:MouseEvent):void
+			{
+				navigator.pushView(AddContactView);				
+			}
+			
+			
+			
+			protected function onAdd(event:FlexEvent):void
+			{
+				if(navigator.poppedViewReturnedObject && navigator.poppedViewReturnedObject.object) 
+				{
+					myContacts.addItem(navigator.poppedViewReturnedObject.object);
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:ArrayCollection id="myContacts" />
+	</fx:Declarations>
+	
+	<s:List width="100%" dataProvider="{myContacts}" itemRenderer="renderer.ContactItemRenderer" />
+	
+	<s:Button label="Add" click="onClick(event)"/>
+</s:View>

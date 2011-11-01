@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Ajouter un contact" xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:Validator source="{firstName}" property="text" required="true" id="firstNameValidator" />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.ValidationResultEvent;
+			
+			private function onAddClick():void {
+				// validate all validators
+				var validators:Array = Validator.validateAll([firstNameValidator]);
+				// if no errors change the view
+				if(validators.length == 0) 
+				{
+					navigator.popView();
+				}
+				else 
+				{
+					// otherwise displays the errors
+					errors.text = "";
+					for each (var validator:ValidationResultEvent in validators)
+					{
+						errors.text += validator.message;
+					}
+				}
+			}
+			
+			override public function createReturnObject():Object {
+				return {firstName:firstName.text, lastName:lastName.text, phone:phone.text, picture:picture.source};
+			}
+			
+			protected function onPictureClick(event:MouseEvent):void
+			{
+				var camera:CameraUI = new CameraUI();
+				camera.addEventListener(MediaEvent.COMPLETE, onCameraUIComplete);
+				camera.launch(MediaType.IMAGE);
+			}
+			
+			
+			protected function onCameraUIComplete(event:MediaEvent):void 
+			{
+				var mediaPromise:MediaPromise = event.data;
+				
+				var loader:Loader = new Loader();
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onMediaPromiseLoaded);
+				loader.loadFilePromise(mediaPromise);
+			}
+			
+			protected function onMediaPromiseLoaded(event:Event):void {
+				var loaderInfo:LoaderInfo = event.target as LoaderInfo;
+				loaderInfo.removeEventListener(Event.COMPLETE, onMediaPromiseLoaded);
+				picture.source = loaderInfo.loader;
+				picture.visible = true;
+			}
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout />
+	</s:layout>
+	
+	<s:Label id="errors" />
+	
+	<s:Image id="picture" visible="false" width="250" height="250"/>
+	<s:Button label="Picture" click="onPictureClick(event)"/>
+	<s:Label text="First Name" />
+	<s:TextInput id="firstName" />
+	<s:Label text="Last Name" />
+	<s:TextInput id="lastName" />
+	<s:Label text="Phone" />
+	<s:TextInput id="phone" />
+	
+	<s:Button label="Add" click="onAddClick()" />
+</s:View>
